@@ -1,0 +1,15 @@
+#+TITLE: Priv folder
+#+AUTHOR: Chop Tr (chop.ink)
+
+* Priv folder
+
+This follow CardanocliJS structure [[[https://github.com/Berry-Pool/cardanocli-js#structure][link]]]
+
+** Secret usage
+
+Keep all the secret keys of the wallet and pool under encryption. Only Owner has access to the key files and passwords.
+
+
+** Core usage
+
+Keep the assigned vrf, kes, and operation cert. Operator in charge of setup these key to operate the Core node.

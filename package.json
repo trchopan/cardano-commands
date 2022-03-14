@@ -1,0 +1,42 @@
+{
+  "name": "cardano-commands",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "secret": "node build/src/secret-app.js",
+    "core": "node build/src/core-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trchopan/cardano-commands.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trchopan/cardano-commands/issues"
+  },
+  "homepage": "https://github.com/trchopan/cardano-commands#readme",
+  "devDependencies": {
+    "@types/inquirer": "^8.2.0",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.13",
+    "@types/lodash": "^4.14.178",
+    "@types/morgan": "^1.9.3",
+    "axios": "^0.25.0",
+    "cardanocli-js": "github:trchopan/cardanocli-js",
+    "date-fns": "^2.28.0",
+    "express": "^4.17.2",
+    "inquirer": "^8.2.0",
+    "lodash": "^4.17.21",
+    "morgan": "^1.10.0"
+  },
+  "volta": {
+    "node": "16.14.0"
+  }
+}
