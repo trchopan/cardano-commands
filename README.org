@@ -1,3 +1,7 @@
+#+hugo_base_dir: ~/Sync/chop-ink/
+#+hugo_tags: cardano stake pool manage secret keys
+#+EXPORT_FILE_NAME: cardano-commands-readme
+
 #+TITLE: Cardano Commands
 #+AUTHOR: Chop Tr (chop.ink)
 #+DATE: <2022-02-06 Sun>
@@ -98,5 +102,9 @@ For an operation to perform, the ~Core Node~ will turn into a API server that se
 
 It's also act as a live =cardano-node= to talk with the blockchain itself for required information. The Secret Node get the information like ~start KES period~, ~protocol params~, etc. to conduct the operations.
 
-* Demo
 
+* License
+
+[[https://opensource.org/licenses/MIT][MIT]]
+
+Copyright (c) 2022-, Quang Tran.
