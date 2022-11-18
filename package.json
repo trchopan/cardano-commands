@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "secret": "node build/src/secret-app.js",
-    "core": "node build/src/core-server.js",
+    "secret": "node build/secret-app.js",
+    "core": "node build/core-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
