@@ -38,8 +38,8 @@ export interface PoolMetadata {
 }
 
 export interface Config {
-    ownerWallet: string;
-    poolName: string;
+    privOwnerWallet: string;
+    privPoolName: string;
     coreApi: string;
     coreSocketPath: string;
     shellyGenesis: string;

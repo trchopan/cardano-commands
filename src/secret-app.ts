@@ -156,7 +156,7 @@ const mkCertificateDepositTx = async ({
     const utxo = await getUtxo(paymentAddr);
     const balance = getBalance(utxo).value;
     if ((balance?.lovelace || 0) < 3) {
-        throw new Error(`Wallet balance is too low ${balance}`);
+        throw new Error(`Wallet balance is too low ${JSON.stringify(balance)}`);
     }
 
     const tx: CardanocliJs.Transaction = {
@@ -262,18 +262,18 @@ const registerPoolCert = async (
 };
 
 const newOrUpdateStakePoolRunner = async () => {
-    const {ownerWallet, poolName} = config;
+    const {privOwnerWallet, privPoolName} = config;
     try {
         // Check if able to load the wallet
-        cardanocliJs.wallet(ownerWallet);
+        cardanocliJs.wallet(privOwnerWallet);
     } catch (err) {
         if ((await inquirerConfirm('Not found Owner Wallet. Should I create it')) === false) {
             process.exit(0);
         }
-        const payment = cardanocliJs.addressKeyGen(ownerWallet);
-        const stake = cardanocliJs.stakeAddressKeyGen(ownerWallet);
-        cardanocliJs.stakeAddressBuild(ownerWallet);
-        cardanocliJs.addressBuild(ownerWallet, {
+        const payment = cardanocliJs.addressKeyGen(privOwnerWallet);
+        const stake = cardanocliJs.stakeAddressKeyGen(privOwnerWallet);
+        cardanocliJs.stakeAddressBuild(privOwnerWallet);
+        cardanocliJs.addressBuild(privOwnerWallet, {
             paymentVkey: payment.vkey,
             stakeVkey: stake.vkey,
         });
@@ -281,29 +281,29 @@ const newOrUpdateStakePoolRunner = async () => {
 
     try {
         // Check if able to load the pool
-        cardanocliJs.pool(poolName);
+        cardanocliJs.pool(privPoolName);
     } catch (err) {
         if ((await inquirerConfirm('Not found Pool. Should I create it?')) === false) {
             process.exit(0);
         }
-        cardanocliJs.nodeKeyGen(poolName);
-        cardanocliJs.nodeKeyGenVRF(poolName);
+        cardanocliJs.nodeKeyGen(privPoolName);
+        cardanocliJs.nodeKeyGenVRF(privPoolName);
     }
 
-    const wallet = cardanocliJs.wallet(ownerWallet);
+    const wallet = cardanocliJs.wallet(privOwnerWallet);
     console.log('Wallet payment address:', wallet.paymentAddr);
-    const pool = cardanocliJs.pool(poolName);
+    const pool = cardanocliJs.pool(privPoolName);
     console.log('Pool Id:', pool.id);
-    await newKESKeyAndOpCert(poolName);
+    await newKESKeyAndOpCert(privPoolName);
 
-    const protocolParams = await getProtocolParams();
+    const {stakeAddressDeposit, stakePoolDeposit} = await getProtocolParams();
     const stakeAddressInfo = await getStakeAddressInfo(wallet.stakingAddr);
 
     if (!isEmpty(stakeAddressInfo)) {
         console.log(color.yellow('Stake Key Certificate already registered'));
         console.log(stakeAddressInfo);
     } else {
-        await registerStakeKeyCert(wallet, protocolParams.stakeAddressDeposit);
+        await registerStakeKeyCert(wallet, stakeAddressDeposit);
     }
 
     if (!pool.node?.skey) {
@@ -311,21 +311,21 @@ const newOrUpdateStakePoolRunner = async () => {
         process.exit(1);
     }
 
-    await registerPoolCert(wallet, pool, protocolParams.stakePoolDeposit);
+    await registerPoolCert(wallet, pool, stakePoolDeposit);
 };
 
 const rotateKESKeyRunner = async () => {
-    const {poolName} = config;
-    await newKESKeyAndOpCert(poolName);
+    const {privPoolName} = config;
+    await newKESKeyAndOpCert(privPoolName);
 };
 
 const retirePoolRunner = async () => {
-    const {ownerWallet, poolName} = config;
+    const {privOwnerWallet, privPoolName} = config;
     const {wallet, pool} = (() => {
         try {
             return {
-                wallet: cardanocliJs.wallet(ownerWallet),
-                pool: cardanocliJs.pool(poolName),
+                wallet: cardanocliJs.wallet(privOwnerWallet),
+                pool: cardanocliJs.pool(privPoolName),
             };
         } catch (err) {
             console.log(color.red('Cannot load pool or wallet'));
@@ -334,20 +334,19 @@ const retirePoolRunner = async () => {
     })();
 
     const currentEpoch = Math.floor(await getCurrentEpoch());
-    const protocolParams = await getProtocolParams();
-    const poolRetireMaxEpoch = protocolParams.poolRetireMaxEpoch;
+    const {poolRetireMaxEpoch} = await getProtocolParams();
     const minRetirementEpoch = currentEpoch + 1;
     const maxRetirementEpoch = currentEpoch + poolRetireMaxEpoch;
 
     const retireEpoch = await inquirerInput(
-        `Enter the epoch to be retired ${minRetirementEpoch} ~ ${maxRetirementEpoch}`,
+        `Enter the epoch to be retired (${minRetirementEpoch} < retire epoch < ${maxRetirementEpoch})`,
         (val: number) =>
             (val > minRetirementEpoch && val < maxRetirementEpoch) ||
             `retirement epoch must be between ${minRetirementEpoch} ~ ${maxRetirementEpoch}`
     );
 
     const deregistrationCert = cardanocliJs.stakePoolDeregistrationCertificate(
-        poolName,
+        privPoolName,
         retireEpoch
     );
 
@@ -397,9 +396,9 @@ const unlockPrivFolderRunner = async () => {
 };
 
 const sendKeysToCoreRunner = async () => {
-    const {poolName} = config;
+    const {privPoolName} = config;
     const keys = ['kes.skey', 'vrf.skey', 'node.cert', 'node.counter', 'node.skey']
-        .map(k => `./priv/pool/${poolName}/${poolName}.${k}`)
+        .map(k => `./priv/pool/${privPoolName}/${privPoolName}.${k}`)
         .map(p => {
             if (!fs.existsSync(p)) {
                 console.log(color.red(`${p} key does not exist`));
@@ -555,6 +554,102 @@ const getUtxoRunner = async () => {
     console.log(utxo);
 };
 
+const mintMARunner = async () => {
+    const {privOwnerWallet} = config;
+    const wallet = (() => {
+        try {
+            // Check if able to load the wallet
+            return cardanocliJs.wallet(privOwnerWallet);
+        } catch (err) {
+            throw new Error('unable to load wallet');
+        }
+    })();
+
+    const mintScript = {
+        keyHash: cardanocliJs.addressKeyHash(wallet.name),
+        type: 'sig',
+    };
+    const policy = cardanocliJs.transactionPolicyid(mintScript);
+    console.log(color.blue('mintScript'), mintScript);
+    console.log(color.blue('policy'), policy);
+
+    const realAssetName = await inquirerInput<string>('Asset name');
+    const assetName = Buffer.from(realAssetName).toString('hex');
+    const coinName = policy + '.' + assetName;
+    console.log(color.blue('asset'));
+    console.log(realAssetName);
+    console.log(coinName);
+
+    if ((await inquirerConfirm('Continue?')) === false) {
+        process.exit(0);
+    }
+    const utxo = await getUtxo(wallet.paymentAddr);
+    const balance = getBalance(utxo).value;
+    if ((balance?.lovelace || 0) < 1) {
+        throw new Error(`Wallet balance is too low ${JSON.stringify(balance)}`);
+    }
+
+    const amountStr = await inquirerInput<string>('Amount to mint:');
+    const coinAmount = (balance[coinName] || 0) + parseInt(amountStr);
+    const tx: CardanocliJs.Transaction = {
+        txIn: utxo as unknown as CardanocliJs.TxIn[], // TODO: Converter between Utxo and TxIn
+        txOut: [
+            {
+                address: wallet.paymentAddr,
+                value: {
+                    ...balance,
+                    [coinName]: coinAmount,
+                },
+                datumHash: '',
+            },
+        ],
+        mint: [
+            {
+                action: 'mint',
+                quantity: (100).toString(),
+                asset: coinName,
+                script: mintScript,
+                datum: '',
+                redeemer: '',
+                executionUnits: '',
+            },
+        ],
+    };
+
+    console.log(color.blue('Transaction:'), JSON.stringify(tx, null, 2));
+    if ((await inquirerConfirm('Continue?')) === false) {
+        process.exit(0);
+    }
+
+    // Create transaction
+    let raw = cardanocliJs.transactionBuildRaw(tx);
+    let fee = cardanocliJs.transactionCalculateMinFee({
+        ...tx,
+        txBody: raw,
+        witnessCount: 2,
+    });
+    tx.txOut[0].value.lovelace -= fee;
+    const txBody = cardanocliJs.transactionBuildRaw({...tx, fee});
+
+    // Sign transaction
+    const txSigned = cardanocliJs.transactionSign({
+        txBody,
+        signingKeys: [wallet.payment.skey, wallet.stake.skey],
+    });
+
+    const txHash = await transactionSubmit(txSigned);
+    if (txHash) {
+        console.log(color.green('Tx submited. TxHash:'), txHash);
+    } else {
+        console.log(color.red('Transaction not submited'));
+    }
+};
+
+const todoOperation = () => {
+    console.log('TODO please check back next version');
+    return Promise.resolve();
+};
+
 const operationMaps: {type: Operation; runner: () => Promise<void>}[] = [
     {type: Operation.UnlockPrivFolder, runner: unlockPrivFolderRunner},
     {type: Operation.LockPrivFolder, runner: lockPrivFolderRunner},
@@ -562,14 +657,15 @@ const operationMaps: {type: Operation; runner: () => Promise<void>}[] = [
     {type: Operation.NewOrUpdateStakePool, runner: newOrUpdateStakePoolRunner},
     {type: Operation.RotateKESKey, runner: rotateKESKeyRunner},
 
-    {type: Operation.SendADA, runner: () => Promise.resolve()},
-    {type: Operation.SendMA, runner: () => Promise.resolve()},
-    {type: Operation.MintMA, runner: () => Promise.resolve()},
+    {type: Operation.SendADA, runner: todoOperation},
+    {type: Operation.SendMA, runner: todoOperation},
+    {type: Operation.MintMA, runner: mintMARunner},
     {type: Operation.GetUTXO, runner: getUtxoRunner},
 
     {type: Operation.RetirePool, runner: retirePoolRunner},
     {type: Operation.SendOperationKeysToCore, runner: sendKeysToCoreRunner},
     {type: Operation.ExtractWalletKeys, runner: extractWalletKeysRunner},
+
     {type: Operation.Exit, runner: () => process.exit(0)},
 ];
 

@@ -52,13 +52,13 @@ export const parseConfig = () => {
         console.log(`Usage: npm run <core|secret> -- config.example.json`);
         process.exit(1);
     }
-    const parseHome = (_: string) => _.replace('~', process.env['HOME']);
+    const parseHome = (s: string) => s.replace('~', process.env['HOME']);
     try {
-        const _ = JSON.parse(String(fs.readFileSync(configFile)));
+        const data = JSON.parse(String(fs.readFileSync(configFile)));
         for (const p of ['coreSocketPath']) {
-            _[p] = parseHome(_[p]);
+            data[p] = parseHome(data[p]);
         }
-        return _ as Config;
+        return data as Config;
     } catch (err) {
         console.error(err);
         console.log('Unable to parse config.');

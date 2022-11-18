@@ -1,6 +1,6 @@
 {
-  "ownerWallet": "Ada",
-  "poolName": "ARMDE",
+  "privOwnerWallet": "Ada",
+  "privPoolName": "ARMDE",
   "coreApi": "http://localhost:3000",
   "coreSocketPath": "~/cardano-my-node/db/socket",
   "shellyGenesis": "~/cardano-my-node/testnet-shelley-genesis.json",
