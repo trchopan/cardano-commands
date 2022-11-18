@@ -60,7 +60,7 @@ I split the responsibility into 2: The Pool Operator and The Pool Owner.
 
 ** The Pool Operator
 
-Is responsible of keeping the pool up and healthy. Manage the configuration, Update the =cardano-node= and =cardano-cli=, the Prometheus and Graphana setup etc. The keys Pool Operator will have are:
+The pool operator is responsible of keeping the pool up and healthy. Manage the configuration, Update the =cardano-node= and =cardano-cli=, the Prometheus and Graphana setup etc. The keys Pool Operator will have are:
 
 For operational:
 + kes.skey
