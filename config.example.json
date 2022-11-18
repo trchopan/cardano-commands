@@ -1,26 +1,26 @@
 {
-  "privOwnerWallet": "Ada",
-  "privPoolName": "ARMDE",
+  "privOwnerWallet": "TestnetWallet",
+  "privPoolName": "MYPOOL",
   "coreApi": "http://localhost:3000",
   "coreSocketPath": "~/cardano-my-node/db/socket",
   "shellyGenesis": "~/cardano-my-node/testnet-shelley-genesis.json",
   "nodeConfig": "testnet",
-  "networkMagic": "testnet-magic 1097911063",
+  "networkMagic": "testnet-magic 2",
   "poolData": {
     "poolPledgeAda": 10000,
     "poolCostAda": 340,
     "poolMargin": 0.02,
     "relays": [
-      {"host": "node.armadacardano.io", "port": 6000},
-      {"host": "node2.armadacardano.io", "port": 6000}
+      {"host": "node.example.io", "port": 6000},
+      {"host": "node2.example.io", "port": 6000}
     ],
-    "metadataUrl": "https://armadacardano.io/metadata2.json"
+    "metadataUrl": "https://example.io/metadata.json"
   },
   "poolMetadata": {
-    "name": "Armada Cardano - xxxxx",
-    "description": "Staking for our fleet. Donating 10% of our pool earnings annually to ESG related projects",
-    "ticker": "ARMDA",
-    "homepage": "https://armadacardano.io",
-    "extended": "https://armadacardano.io/extended.json"
+    "name": "Example Pool",
+    "description": "My awesome pool for testnet",
+    "ticker": "EXAMP",
+    "homepage": "https://example.io",
+    "extended": "https://example.io/extended.json"
   }
 }

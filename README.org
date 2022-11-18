@@ -12,12 +12,10 @@ Most of the time I was following the 2 tutorials [[https://www.coincashew.com/co
 
 During my setups, the part where I need to manage the keys was the most confusing and error prone. So I wrote this tool to help me automate the steps in handling the pool keys, hope it may help other pool operators when you guys need to setup and manage one.
 
-This tool is written as part of toolbox to manage Armada Stake pool - ticker [[https://armadacardano.io/][ARMDA]].
-
 
 * Requirements
 
-- Nodejs > 14
+- Nodejs >= 16
 
 Cardano tool will interact with the current Cardano blockchain therefore latest tool is needed to perform below operations.
 
@@ -102,6 +100,57 @@ For an operation to perform, the ~Core Node~ will turn into a API server that se
 
 It's also act as a live =cardano-node= to talk with the blockchain itself for required information. The Secret Node get the information like ~start KES period~, ~protocol params~, etc. to conduct the operations.
 
+* Priv folder
+
+Location: ~./priv/~
+
+Example folder tree follow =config.example.json=
+
+Note that the name of =privPoolName= and =privOwnerWallet= should correspond to priv folder structure.
+
+#+begin_src
+priv
+|-- pool
+|   `-- MYPOOL
+|       |-- MYPOOL.kes.skey
+|       |-- MYPOOL.kes.vkey
+|       |-- MYPOOL.node.cert
+|       |-- MYPOOL.node.counter
+|       |-- MYPOOL.node.skey
+|       |-- MYPOOL.node.vkey
+|       |-- MYPOOL.pool.cert
+|       |-- MYPOOL.vrf.skey
+|       `-- MYPOOL.vrf.vkey
+`-- wallet
+    `-- TestnetWallet
+        |-- TestnetWallet.deleg.cert
+        |-- TestnetWallet.payment.addr
+        |-- TestnetWallet.payment.skey
+        |-- TestnetWallet.payment.vkey
+        |-- TestnetWallet.stake.addr
+        |-- TestnetWallet.stake.skey
+        `-- TestnetWallet.stake.vkey
+
+#+end_src
+
+* Notes
+
+** GPG error: gpg-agent forwarding: inappropriate ioctl for device
+
+Add this to GPG configs:
+
+~/.gnupg/gpg.conf:
+
+#+begin_src
+use-agent
+pinentry-mode loopback
+#+end_src
+
+~/.gnupg/gpg-agent.conf
+
+#+begin_src
+allow-loopback-pinentry
+#+end_src
 
 * License
 

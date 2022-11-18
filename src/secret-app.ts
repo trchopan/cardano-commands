@@ -14,20 +14,15 @@ import {
     backupThenRemoveFiles,
     execToStr,
     inquirerInput,
+    getCardanoCli,
 } from './helpers';
 import {Operation} from './operation';
 import {isEmpty} from 'lodash';
 
-// A small hack for getting correct type as `cardanocli-js` is written in javascript
-const CardanocliJs_ = require('cardanocli-js');
-
 const OUTPUT_PRIV_GPG = './priv.tar.gz.gpg';
 
 const config = parseConfig();
-const cardanocliJs: CardanocliJs = new CardanocliJs_({
-    network: config.networkMagic,
-    era: 'alonzo',
-});
+const cardanocliJs: CardanocliJs = getCardanoCli(config);
 
 const api = axios.create({
     baseURL: config.coreApi,
