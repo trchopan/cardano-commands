@@ -458,7 +458,7 @@ const extractWalletKeysRunner = async () => {
             'Must be 15 or 24 mnemonics separate by single white space'
     );
     // Extract the keys using bech32
-    const extractCmds = [
+    [
         `echo ${mnemonic} | ${CADDR} key from-recovery-phrase Shelley > root.prv`,
         `cat root.prv |${CADDR} key child 1852H/1815H/0H/2/0 > stake.xprv`,
         `cat root.prv |${CADDR} key child 1852H/1815H/0H/0/0 > payment.xprv`,
@@ -473,9 +473,7 @@ const extractWalletKeysRunner = async () => {
         ].join(' '),
         'echo "Generated from 1852H/1815H/0H/{0,2}/0"',
         'echo cat base.addr_candidate',
-    ];
-
-    extractCmds.forEach(execSync);
+    ].forEach(execSync);
 
     const [seskey, peskey] = ['stake', 'payment'].map(key =>
         execToStr(
@@ -536,7 +534,7 @@ const extractWalletKeysRunner = async () => {
 
     console.log('Extract success');
 
-    // Put the keys in priv format and gpg tar it
+    // Put the keys in priv folder
 
     const walletName = await inquirerInput('Wallet name');
     const walletDir = `./priv/wallet/${walletName}`;
