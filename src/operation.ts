@@ -43,7 +43,6 @@ export interface Config {
     coreApi: string;
     coreSocketPath: string;
     shelleyGenesis: string;
-    nodeConfig: string;
     networkMagic: string;
     poolData: PoolData;
     poolMetadata: PoolMetadata;

@@ -4,7 +4,6 @@
   "coreApi": "http://localhost:3000",
   "coreSocketPath": "~/cardano-my-node/db/socket",
   "shelleyGenesis": "~/cardano-my-node/testnet-shelley-genesis.json",
-  "nodeConfig": "testnet",
   "networkMagic": "testnet-magic 2",
   "poolData": {
     "poolPledgeAda": 10000,

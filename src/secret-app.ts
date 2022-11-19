@@ -557,7 +557,7 @@ const extractWalletKeysRunner = async () => {
 };
 
 const getUtxoRunner = async () => {
-    const addr = await inquirerInput<string>('addr = ');
+    const addr = await inquirerInput<string>('addr:');
     const utxo = await getUtxo(addr);
     console.log(utxo);
 };
