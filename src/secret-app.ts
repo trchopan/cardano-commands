@@ -431,10 +431,18 @@ const extractWalletKeysRunner = async () => {
         }
     }
 
-    const networkSelect = await inquirerSelect('Select network', ['testnet', 'mainnet']);
+    const networkSelect = await inquirerSelect('Select network', ['preview', 'preprod', 'mainnet']);
 
-    const [network, magic] =
-        networkSelect === 'mainnet' ? ['1', '--mainnet'] : ['0', '--testnet-magic 2']; // preview: 2, prerod: 1
+    const [network, networkFlag] = (() => {
+        switch (networkSelect) {
+            case 'preview':
+                return ['0', '--testnet-magic 2'];
+            case 'preprod':
+                return ['0', '--testnet-magic 1'];
+            case 'mainnet':
+                return ['1', '--mainnet'];
+        }
+    })();
 
     console.log(
         color.red(
@@ -502,9 +510,9 @@ const extractWalletKeysRunner = async () => {
         `"${CCLI}" shelley key verification-key --signing-key-file payment.skey --verification-key-file payment.evkey`,
         `"${CCLI}" shelley key non-extended-key --extended-verification-key-file payment.evkey --verification-key-file payment.vkey`,
         `"${CCLI}" shelley key non-extended-key --extended-verification-key-file stake.evkey --verification-key-file stake.vkey`,
-        `"${CCLI}" shelley stake-address build --stake-verification-key-file stake.vkey ${magic} > stake.addr`,
-        `"${CCLI}" shelley address build --payment-verification-key-file payment.vkey ${magic} > payment.addr`,
-        `"${CCLI}" shelley address build --payment-verification-key-file payment.vkey --stake-verification-key-file stake.vkey ${magic} > base.addr`,
+        `"${CCLI}" shelley stake-address build --stake-verification-key-file stake.vkey ${networkFlag} > stake.addr`,
+        `"${CCLI}" shelley address build --payment-verification-key-file payment.vkey ${networkFlag} > payment.addr`,
+        `"${CCLI}" shelley address build --payment-verification-key-file payment.vkey --stake-verification-key-file stake.vkey ${networkFlag} > base.addr`,
         `echo "base.addr_candidate" $(cat base.addr_candidate)`,
         `echo "base.addr" $(cat base.addr)`,
         `mv base.addr payment.addr`,
