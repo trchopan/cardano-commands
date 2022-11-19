@@ -483,22 +483,28 @@ const extractWalletKeysRunner = async () => {
 
     fs.writeFileSync(
         'stake.skey',
-        `{
-    "type": "StakeExtendedSigningKeyShelley_ed25519_bip32",
-    "description": "",
-    "cborHex": "5880${seskey}"
-}
-`
+        JSON.stringify(
+            {
+                type: 'StakeExtendedSigningKeyShelley_ed25519_bip32',
+                description: '',
+                cborHex: `5880${seskey}`,
+            },
+            null,
+            4
+        )
     );
 
     fs.writeFileSync(
         'payment.skey',
-        `{
-    "type": "PaymentExtendedSigningKeyShelley_ed25519_bip32",
-    "description": "Payment Signing Key",
-    "cborHex": "5880${peskey}"
-}
-`
+        JSON.stringify(
+            {
+                type: 'PaymentExtendedSigningKeyShelley_ed25519_bip32',
+                description: 'Payment Signing Key',
+                cborHex: `5880${peskey}`,
+            },
+            null,
+            4
+        )
     );
 
     // Build the keys using cardano-cli
