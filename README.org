@@ -58,32 +58,23 @@ I split the responsibility into 2: The Pool Operator and The Pool Owner.
 
 ** The Pool Operator
 
-The pool operator is responsible of keeping the pool up and healthy. Manage the configuration, Update the =cardano-node= and =cardano-cli=, the Prometheus and Graphana setup etc. The keys Pool Operator will have are:
-
-For operational:
-+ kes.skey
-+ vrf.skey
-+ node.cert
-
-For refresing the KES:
-+ node.counter
-+ node.skey
-+ kes.vkey
+The pool operator is responsible of keeping the pool up and healthy. Manage the configuration, Update the =cardano-node= and =cardano-cli=, the Prometheus and Graphana setup etc. The keys Pool Operator serve the API to provide the pool owner scripts with the blockchain information. And submit the transactions to the blockchain.
 
 ** The Pool Owner
-Is the one who has access to the pool pledge and no one else. Only him can have the payment and stake keys, his responsibility is to keep all the cold keys safe under a =Master Password=. The Pool Owner can perform operations:
+
+The pool owner has access to the pool wallet and no one else. Only him can have the payment and stake keys, his responsibility is to keep all the keys safe under a =Master Password=. The Pool Owner can perform operations:
 
 + Create new Pool
 + Update Pool information (certificate)
 + Retire the pool
 
-He/She should use the 24 mnemonic words to gain the ownership of the keys. This way he can easily import the wallet to wallet software like Daelus or Yoroi to comfortably sending and receiving payment as well as withdraw rewards.
+The pool owner should use the 24 mnemonic words to extract the keys. This way he can easily import the wallet to wallet software like Daelus or Yoroi to comfortably sending and receiving payment as well as withdraw rewards.
 
 ** Why not using already avaiable tool like CNTools
 
-There is a awesome tool from the cardano-community > [[https://cardano-community.github.io/guild-operators/basics][CNTools]] < that will perform all the operation above with ease. I suggest if you first building a new pool, you can refer to them as the Swiss-army knife to interact with the Cardano Blockchain.
+There is a awesome tool from the cardano-community > [[https://cardano-community.github.io/guild-operators/basics][CNTools]] < that will perform all the operation above with ease. I suggest if you first building a new pool, you can refer to them to interact with the Cardano Blockchain to understand all the moving parts.
 
-But I have extra requirements that I would like to keep for my setup.
+Developing this tool, I have extra setup requirements:
 
 1. The =Pool Operator= have no access to the Payment keys and only the Ower himself can have those.
 2. The Owner no need to operate the =cardano-node= setup
@@ -94,7 +85,7 @@ But I have extra requirements that I would like to keep for my setup.
 This tool also has 2 parts that follow the responsibilities above but mainly will be used by the Pool Owner for his/her operations.
 
 #+attr_html: :width 720
-[[./setup-diagram_20220220_232111.png]]
+[[./setup-diagram.jpg]]
 
 For an operation to perform, the ~Core Node~ will turn into a API server that serve queries from the ~Secret Nodes~ and also taking down the Keys after the secret node generate and combine those.
 
