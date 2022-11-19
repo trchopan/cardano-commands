@@ -24,17 +24,14 @@ export const execToStr = (cmd: string) => {
     return String(execSync(cmd));
 };
 
-export const backupFiles = (
+export const backupThenRemoveFiles = (
     paths: string[],
     backupSuffix: string = format(new Date(), 'yyyy-MM-dd_HH-mm-ss')
 ) => {
     for (const p of paths) {
         execSync(`cp ${p} ${p}_${backupSuffix}`);
     }
-};
 
-export const backupThenRemoveFiles = (paths: string[], backupSuffix?: string) => {
-    backupFiles(paths, backupSuffix);
     for (const p of paths) {
         execSync(`rm -rf ${p}`);
     }
