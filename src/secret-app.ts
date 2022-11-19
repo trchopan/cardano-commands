@@ -77,7 +77,7 @@ const transactionSubmit = async (txPath: string) => {
 };
 
 const getBalance = (utxos: CardanocliJs.Utxo[]) => {
-    const value: {[asset: string]: number, lovelace?: number} = {};
+    const value: {[asset: string]: number; lovelace?: number} = {};
     utxos.forEach(utxo => {
         Object.keys(utxo.value).forEach(asset => {
             if (!value[asset]) value[asset] = 0;
@@ -414,7 +414,7 @@ const sendKeysToCoreRunner = async () => {
 const extractWalletKeysRunner = async () => {
     console.log(
         color.red(
-            'WARNING: this extraction will overwrite the priv/wallet.tar.gz file. Please backup before continue.'
+            'WARNING: this extraction will overwrite the priv folder. Please backup before continue.'
         )
     );
 
@@ -454,15 +454,17 @@ const extractWalletKeysRunner = async () => {
         `echo ${mnemonic} | ${CADDR} key from-recovery-phrase Shelley > root.prv`,
         `cat root.prv |${CADDR} key child 1852H/1815H/0H/2/0 > stake.xprv`,
         `cat root.prv |${CADDR} key child 1852H/1815H/0H/0/0 > payment.xprv`,
-        `cat payment.xprv | \
-${CADDR} key public | \
-tee payment.xpub | \
-${CADDR} address payment --network-tag ${network} | \
-${CADDR} address delegation $(cat stake.xprv | ${CADDR} key public | tee stake.xpub) | \
-tee base.addr_candidate | \
-${CADDR} address inspect`,
-        `echo "Generated from 1852H/1815H/0H/{0,2}/0"`,
-        `echo cat base.addr_candidate`,
+        [
+            `cat payment.xprv | `,
+            `${CADDR} key public | `,
+            `tee payment.xpub | `,
+            `${CADDR} address payment --network-tag ${network} | `,
+            `${CADDR} address delegation $(cat stake.xprv | ${CADDR} key public | tee stake.xpub) | `,
+            `tee base.addr_candidate | `,
+            `${CADDR} address inspect`,
+        ].join(' '),
+        'echo "Generated from 1852H/1815H/0H/{0,2}/0"',
+        'echo cat base.addr_candidate',
     ];
 
     extractCmds.forEach(execSync);
@@ -581,7 +583,7 @@ const mintMARunner = async () => {
     }
 
     const amountStr = await inquirerInput<string>('Amount to mint:');
-    const amount = parseInt(amountStr)
+    const amount = parseInt(amountStr);
     const coinAmount = (balance[coinName] || 0) + amount;
     const tx: CardanocliJs.Transaction = {
         txIn: utxo as unknown as CardanocliJs.TxIn[], // TODO: Converter between Utxo and TxIn
