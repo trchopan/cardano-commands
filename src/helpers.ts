@@ -55,7 +55,7 @@ export const parseConfig = () => {
     const parseHome = (s: string) => s.replace('~', process.env['HOME']);
     try {
         const data = JSON.parse(String(fs.readFileSync(configFile)));
-        for (const p of ['coreSocketPath']) {
+        for (const p of ['coreSocketPath', 'shelleyGenesis']) {
             data[p] = parseHome(data[p]);
         }
         return data as Config;
@@ -69,12 +69,12 @@ export const parseConfig = () => {
     }
 };
 
-export const getCardanoCli = (config: Config) =>
+export const getCardanoCli = ({networkMagic, shelleyGenesis, coreSocketPath}: Config) =>
     new CardanocliJs_({
-        network: config.networkMagic,
+        network: networkMagic,
         era: 'alonzo',
-        shelleyGenesisPath: config.shellyGenesis,
-        socketPath: config.coreSocketPath,
+        shelleyGenesisPath: shelleyGenesis,
+        socketPath: coreSocketPath,
     }) as CardanocliJs;
 
 export const inquirerConfirm = async (message: string) =>

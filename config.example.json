@@ -3,7 +3,7 @@
   "privPoolName": "MYPOOL",
   "coreApi": "http://localhost:3000",
   "coreSocketPath": "~/cardano-my-node/db/socket",
-  "shellyGenesis": "~/cardano-my-node/testnet-shelley-genesis.json",
+  "shelleyGenesis": "~/cardano-my-node/testnet-shelley-genesis.json",
   "nodeConfig": "testnet",
   "networkMagic": "testnet-magic 2",
   "poolData": {
