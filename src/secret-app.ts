@@ -76,38 +76,37 @@ const transactionSubmit = async (txPath: string) => {
     return data;
 };
 
-// Taken from wallet.ballance()
-const getBalance = (utxo: CardanocliJs.Utxo[]) => {
-    const value: {lovelace?: number} = {};
-    utxo.forEach(utxo => {
+const getBalance = (utxos: CardanocliJs.Utxo[]) => {
+    const value: {[asset: string]: number, lovelace?: number} = {};
+    utxos.forEach(utxo => {
         Object.keys(utxo.value).forEach(asset => {
             if (!value[asset]) value[asset] = 0;
             value[asset] += utxo.value[asset];
         });
     });
 
-    return {utxo: utxo, value};
+    return value;
 };
 
 const versionCheck = async (): Promise<boolean> => {
     console.log(color.cyan('Checking versions'));
 
     const versionsToCheck = [
-        {item: 'cardano-node', version: getCardanoNodeVersion()},
-        {item: 'cardano-cli', version: getCardanoCliVersion()},
+        {tool: 'cardano-node', version: getCardanoNodeVersion()},
+        {tool: 'cardano-cli', version: getCardanoCliVersion()},
     ];
 
     try {
         const cardanoVersion = await getCardanoVersion();
-        for (const v of versionsToCheck) {
-            if (v.version !== cardanoVersion) {
+        for (const {tool, version} of versionsToCheck) {
+            if (version !== cardanoVersion) {
                 console.log(
-                    color.red(`${v.item} version is not match.`),
-                    `current version: ${v.version}, api version: ${cardanoVersion}`
+                    color.red(`${tool} version is not match.`),
+                    `current version: ${version}, api version: ${cardanoVersion}`
                 );
                 return false;
             }
-            console.log(color.green('Good'), v.item, v.version);
+            console.log(color.green('Good'), tool, version);
         }
 
         return true; // Everything good
@@ -149,7 +148,7 @@ const mkCertificateDepositTx = async ({
     signingKeys: string[];
 }) => {
     const utxo = await getUtxo(paymentAddr);
-    const balance = getBalance(utxo).value;
+    const balance = getBalance(utxo);
     if ((balance?.lovelace || 0) < 3) {
         throw new Error(`Wallet balance is too low ${JSON.stringify(balance)}`);
     }
@@ -575,17 +574,15 @@ const mintMARunner = async () => {
     console.log(realAssetName);
     console.log(coinName);
 
-    if ((await inquirerConfirm('Continue?')) === false) {
-        process.exit(0);
-    }
     const utxo = await getUtxo(wallet.paymentAddr);
-    const balance = getBalance(utxo).value;
+    const balance = getBalance(utxo);
     if ((balance?.lovelace || 0) < 1) {
         throw new Error(`Wallet balance is too low ${JSON.stringify(balance)}`);
     }
 
     const amountStr = await inquirerInput<string>('Amount to mint:');
-    const coinAmount = (balance[coinName] || 0) + parseInt(amountStr);
+    const amount = parseInt(amountStr)
+    const coinAmount = (balance[coinName] || 0) + amount;
     const tx: CardanocliJs.Transaction = {
         txIn: utxo as unknown as CardanocliJs.TxIn[], // TODO: Converter between Utxo and TxIn
         txOut: [
@@ -600,8 +597,8 @@ const mintMARunner = async () => {
         ],
         mint: [
             {
-                action: 'mint',
-                quantity: (100).toString(),
+                action: amount >= 0 ? 'mint' : 'burn',
+                quantity: Math.abs(amount).toString(),
                 asset: coinName,
                 script: mintScript,
                 datum: '',
