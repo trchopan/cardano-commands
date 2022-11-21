@@ -42,6 +42,7 @@ export interface Config {
     privPoolName: string;
     coreApi: string;
     coreSocketPath: string;
+    protocolParametersPath: string;
     shelleyGenesis: string;
     networkMagic: string;
     poolData: PoolData;

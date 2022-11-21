@@ -66,10 +66,16 @@ export const parseConfig = () => {
     }
 };
 
-export const getCardanoCli = ({networkMagic, shelleyGenesis, coreSocketPath}: Config) =>
+export const getCardanoCli = ({
+    networkMagic,
+    shelleyGenesis,
+    coreSocketPath,
+    protocolParametersPath,
+}: Config) =>
     new CardanocliJs_({
         network: networkMagic,
         era: 'alonzo',
+        protocolParametersPath,
         shelleyGenesisPath: shelleyGenesis,
         socketPath: coreSocketPath,
     }) as CardanocliJs;
