@@ -69,6 +69,12 @@ const getProtocolParams = async () => {
     return data;
 };
 
+const getQueryTip = async () => {
+    const {data} = await api.get('/query-tip');
+    console.log(data);
+    return data;
+};
+
 const transactionSubmit = async (txPath: string) => {
     const {data} = await api.post('/submit-tx', {
         tx: JSON.parse(String(fs.readFileSync(txPath))),
@@ -153,6 +159,7 @@ const mkCertificateDepositTx = async ({
         throw new Error(`Wallet balance is too low ${JSON.stringify(balance)}`);
     }
 
+    const {slot} = await getQueryTip();
     const tx: CardanocliJs.Transaction = {
         txIn: utxo as unknown as CardanocliJs.TxIn[], // TODO: Converter between Utxo and TxIn
         txOut: [
@@ -166,6 +173,7 @@ const mkCertificateDepositTx = async ({
             },
         ],
         certs,
+        invalidAfter: slot + 1000,
     };
 
     const txBodyRaw = cardanocliJs.transactionBuildRaw(tx);
@@ -597,6 +605,7 @@ const mintMARunner = async () => {
     const amountStr = await inquirerInput<string>('Amount to mint:');
     const amount = parseInt(amountStr);
     const coinAmount = (balance[coinName] || 0) + amount;
+    const {slot} = await getQueryTip();
     const tx: CardanocliJs.Transaction = {
         txIn: utxo as unknown as CardanocliJs.TxIn[], // TODO: Converter between Utxo and TxIn
         txOut: [
@@ -620,6 +629,7 @@ const mintMARunner = async () => {
                 executionUnits: '',
             },
         ],
+        invalidAfter: slot + 1000,
     };
 
     console.log(color.blue('Transaction:'), JSON.stringify(tx, null, 2));

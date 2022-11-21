@@ -50,6 +50,11 @@ app.get('/query-utxo/:paymentAddr', async (req, res) => {
     res.status(200).json({utxo});
 });
 
+app.get('/query-tip', async (req, res) => {
+    const tip = cardanocliJs.queryTip();
+    res.status(200).json(tip);
+});
+
 app.post('/submit-tx', async (req, res) => {
     const {tx} = req.body;
     const result = cardanocliJs.transactionSubmit(tx);
