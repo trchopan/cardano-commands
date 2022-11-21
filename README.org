@@ -77,8 +77,8 @@ There is a awesome tool from the cardano-community > [[https://cardano-community
 Developing this tool, I have extra setup requirements:
 
 1. The =Pool Operator= have no access to the Payment keys and only the Ower himself can have those.
-2. The Owner no need to operate the =cardano-node= setup
-3. The Owner is the one building the transactions (safer compare to sign a transaction copy over from the block producer node)
+2. The Owner firewall only communicate with the =Core Node API=
+3. The Owner is the one building the transactions with information query from the =Core Node API=
 
 ** cardano-commands
 
