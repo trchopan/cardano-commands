@@ -52,7 +52,10 @@ export const parseConfig = () => {
     const parseHome = (s: string) => s.replace('~', process.env['HOME']);
     try {
         const data = JSON.parse(String(fs.readFileSync(configFile)));
-        for (const p of ['coreSocketPath', 'shelleyGenesis']) {
+        for (const p of ['coreSocketPath', 'shelleyGenesis', 'protocolParametersPath']) {
+            if (!data[p]) {
+                break;
+            }
             data[p] = parseHome(data[p]);
         }
         return data as Config;
